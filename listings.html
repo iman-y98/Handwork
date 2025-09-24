@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Listings</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo">IAM</div>
+        <div>
+          <div style="font-weight:800">Listings</div>
+          <div style="font-size:13px;color:var(--muted)">
+            Browse mentors
+          </div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="listings.html">Listings</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="admin.html">Admin</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </header>
+
+    <!-- Listings Section -->
+    <section class="center">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <h2>Available apprenticeships</h2>
+        <a class="btn" href="register.html">Post a listing</a>
+      </div>
+
+      <div style="margin-top:12px">
+        <input 
+          id="filter" 
+          placeholder="Filter by trade or location" 
+          style="padding:10px;border-radius:10px;border:1px solid #e6edf3;width:100%"
+        />
+      </div>
+
+      <div id="listingsWrap" style="margin-top:16px"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      © <span id="yearL"></span>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script>
+    // Footer year
+    document.getElementById('yearL').textContent = new Date().getFullYear();
+
+    // Search query from URL
+    const urlParams = new URLSearchParams(location.search);
+    const q = (urlParams.get('q') || '').toLowerCase();
+    document.getElementById('filter').value = q;
+
+    function render() {
+      const term = document.getElementById('filter').value.toLowerCase();
+      const list = getListings().filter(l => {
+        return (l.trade || '').toLowerCase().includes(term) ||
+               (l.location || '').toLowerCase().includes(term) ||
+               (l.name || '').toLowerCase().includes(term);
+      });
+
+      const wrap = document.getElementById('listingsWrap');
+
+      if (list.length === 0) {
+        wrap.innerHTML = `
+          <div class="card">
+            <p class="muted">No matches found.</p>
+          </div>
+        `;
+        return;
+      }
+
+      wrap.innerHTML = list.map(l => `
+        <div class="card">
+          <div class="listing">
+            <div class="avatar">${l.trade.charAt(0) || 'M'}</div>
+            <div class="meta">
+              <h3>${escapeHtml(l.name)} — ${escapeHtml(l.trade)}</h3>
+              <p class="muted">
+                ${escapeHtml(l.location)} · ${escapeHtml(l.experience)} years experience
+              </p>
+              <div style="margin-top:8px">
+                <a class="btn" href="profile.html?id=${l.id}">View profile</a>
+                <button class="btn" onclick="requestApprentice('${l.id}')">Request</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render on filter input change
+    document.getElementById('filter').addEventListener('input', render);
+    render();
+  </script>
+</body>
+</html>

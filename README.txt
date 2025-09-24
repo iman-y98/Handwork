@@ -1,0 +1,1 @@
+Open index.html in a browser. Data is stored locally in localStorage. Use Admin → Seed demo to add sample listings.

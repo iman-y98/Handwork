@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informal Apprenticeship Matching</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo">IAM</div>
+        <div>
+          <div style="font-weight:800">Informal Apprenticeship Matching</div>
+          <div style="font-size:13px;color:var(--muted)">
+            Connect learners with local tradespeople
+          </div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="listings.html">Listings</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="admin.html">Admin</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div>
+        <h1>Find your next apprenticeship — locally and quickly</h1>
+        <p class="muted">
+          Search trades, compare profiles, and book an introductory meeting.
+        </p>
+
+        <div style="margin-top:16px" class="search-box">
+          <input 
+            id="search" 
+            placeholder="Search by trade or location — e.g. tailoring, welding, Lagos" 
+          />
+          <button class="btn" id="searchBtn">Search</button>
+        </div>
+
+        <div class="grid" style="margin-top:18px">
+          <div class="card">
+            <h3>How it works</h3>
+            <p class="muted">
+              1) Search a trade — 2) View nearby mentors — 3) Request an apprenticeship
+            </p>
+          </div>
+          <div class="card">
+            <h3>For mentors</h3>
+            <p class="muted">
+              Create a profile, list skills, set availability, and accept apprentices.
+            </p>
+          </div>
+          <div class="card">
+            <h3>For apprentices</h3>
+            <p class="muted">
+              Find hands-on training, message mentors, and schedule visits.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside>
+        <div class="card">
+          <h3>Quick actions</h3>
+          <p class="muted">Add a profile or post a listing to get discovered.</p>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <a class="btn" href="register.html">Create account</a>
+            <a class="btn" href="listings.html" style="background:#39a66f">View listings</a>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="card">
+          <h4>Featured mentor</h4>
+          <div class="listing" style="margin-top:10px">
+            <div class="avatar">A</div>
+            <div class="meta">
+              <h3>Amaka — Tailor</h3>
+              <p class="muted">
+                Ikeja, Lagos · 6 years experience · Accepting 2 apprentices
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Recent Listings -->
+    <section class="center">
+      <h2>Recent listings</h2>
+      <div id="recentList"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      Built with care — © <span id="year"></span>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const q = encodeURIComponent(document.getElementById('search').value.trim());
+      location.href = 'listings.html?q=' + q;
+    });
+
+    const recentList = document.getElementById('recentList');
+    const listings = getListings().slice(0, 4);
+
+    if (listings.length === 0) {
+      recentList.innerHTML = `
+        <div class="card">
+          <p class="muted">No listings found. Use Admin → Seed demo.</p>
+        </div>
+      `;
+    } else {
+      recentList.innerHTML = listings.map(l => `
+        <div class="card listing" style="margin-bottom:10px">
+          <div class="avatar">${l.trade.charAt(0) || 'M'}</div>
+          <div class="meta">
+            <h3>${escapeHtml(l.name)} — ${escapeHtml(l.trade)}</h3>
+            <p class="muted">
+              ${escapeHtml(l.location)} · 
+              ${escapeHtml(l.experience)} years · 
+              ${escapeHtml(l.slots)} slots
+            </p>
+            <div style="margin-top:8px">
+              <a class="btn" href="profile.html?id=${l.id}">View profile</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

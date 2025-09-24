@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Register</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo">IAM</div>
+        <div>
+          <div style="font-weight:800">Register</div>
+          <div style="font-size:13px;color:var(--muted)">
+            Create account and optionally post a listing
+          </div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="listings.html">Listings</a>
+      </nav>
+    </header>
+
+    <!-- Main -->
+    <section class="center">
+      <!-- Account Form -->
+      <div class="form">
+        <h3>Create account</h3>
+        <label for="rname">Name</label>
+        <input id="rname" placeholder="Full name"/>
+
+        <label for="remail">Email</label>
+        <input id="remail" type="email" placeholder="you@example.com"/>
+
+        <label for="rpassword">Password</label>
+        <input id="rpassword" type="password"/>
+
+        <div style="margin-top:12px">
+          <button class="btn" id="createAcc">Create account</button>
+        </div>
+      </div>
+
+      <!-- Listing Form -->
+      <div class="form" style="margin-top:18px">
+        <h3>Post a listing (optional)</h3>
+
+        <label for="trade">Trade</label>
+        <input id="trade"/>
+
+        <label for="location">Location</label>
+        <input id="location"/>
+
+        <div class="row">
+          <div class="col">
+            <label for="experience">Experience (years)</label>
+            <input id="experience" type="number" value="1"/>
+          </div>
+          <div class="col">
+            <label for="slots">Slots</label>
+            <input id="slots" type="number" value="2"/>
+          </div>
+        </div>
+
+        <label for="about">About</label>
+        <textarea id="about"></textarea>
+
+        <div style="margin-top:12px">
+          <button class="btn" id="postListing">Post listing</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      Register — © <span id="y4"></span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Year
+    document.getElementById('y4').textContent = new Date().getFullYear();
+
+    // Create account
+    document.getElementById('createAcc').addEventListener('click', () => {
+      const name = document.getElementById('rname').value.trim();
+      const email = document.getElementById('remail').value.trim();
+      const pwd = document.getElementById('rpassword').value;
+
+      if (!name || !email || !pwd) {
+        alert('Please complete account fields');
+        return;
+      }
+
+      register({ name, email, password: pwd });
+      alert('Account created locally. You can now post a listing or login.');
+    });
+
+    // Post listing
+    document.getElementById('postListing').addEventListener('click', () => {
+      const trade = document.getElementById('trade').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const exp = document.getElementById('experience').value || 1;
+      const slots = document.getElementById('slots').value || 1;
+      const about = document.getElementById('about').value;
+      const user = getCurrentUser();
+
+      if (!user) {
+        alert('Please create an account first (top form).');
+        return;
+      }
+
+      createListing({
+        name: user.name,
+        trade,
+        location,
+        experience: exp,
+        slots: slots,
+        about,
+        owner: user.email
+      });
+
+      alert('Listing posted. Visit Listings page.');
+    });
+  </script>
+</body>
+</html>

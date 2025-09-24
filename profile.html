@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Profile</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo">IAM</div>
+        <div style="font-weight:800">Profile</div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="listings.html">Listings</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+    </header>
+
+    <!-- Main -->
+    <section class="center">
+      <div id="profileWrap" class="form">
+        <!-- Profile content will be injected here by JS -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      Profile — © <span id="y"></span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Set year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Load profile data
+    const url = new URL(location);
+    const id = url.searchParams.get('id');
+    const wrap = document.getElementById('profileWrap');
+    const listings = getListings();
+    const p = listings.find(x => x.id === id);
+
+    if (!p) {
+      wrap.innerHTML = `
+        <p class="muted">
+          Profile not found. Go back to 
+          <a href="listings.html">listings</a>.
+        </p>`;
+    } else {
+      wrap.innerHTML = `
+        <div class="profile-header">
+          <div class="profile-avatar">${p.name.charAt(0)}</div>
+          <div>
+            <h2>${escapeHtml(p.name)}</h2>
+            <div class="muted">${escapeHtml(p.trade)} — ${escapeHtml(p.location)}</div>
+            <div class="profile-meta">
+              <span class="badge">${escapeHtml(p.slots)} slots</span>
+              <small class="muted">· ${escapeHtml(p.experience)} yrs experience</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>About</h3>
+          <p class="muted">${escapeHtml(p.about || 'No description provided.')}</p>
+        </div>
+
+        <div class="profile-section">
+          <h3>Contact & request</h3>
+          <p class="muted">
+            Send a request to this mentor to schedule a visit. 
+            Your request will be stored locally.
+          </p>
+          <textarea id="message" placeholder="Write a short message (why you want to learn)"></textarea>
+          <div style="margin-top:8px">
+            <button class="btn" id="sendReq">Send request</button>
+          </div>
+        </div>
+      `;
+
+      // Handle request button
+      document.getElementById('sendReq').addEventListener('click', () => {
+        const msg = document.getElementById('message').value.trim();
+        saveRequest({ to: p.id, message: msg, at: new Date().toISOString() });
+        alert('Request saved locally. Visit Dashboard → Requests.');
+      });
+    }
+  </script>
+</body>
+</html>

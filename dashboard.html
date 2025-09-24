@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo">IAM</div>
+        <div>
+          <div style="font-weight:800">Dashboard</div>
+          <div style="font-size:13px;color:var(--muted)">
+            Your activity
+          </div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="listings.html">Listings</a>
+        <a href="admin.html">Admin</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </header>
+
+    <!-- Activity Section -->
+    <section class="center">
+      <h2>My activity</h2>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="card">
+          <h3>My listings</h3>
+          <div id="myListings"></div>
+        </div>
+        <div class="card">
+          <h3>Requests</h3>
+          <div id="myRequests"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      Dashboard — © <span id="yr"></span>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script>
+    // Set year in footer
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    const myListingsEl = document.getElementById('myListings');
+    const myRequestsEl = document.getElementById('myRequests');
+    const user = getCurrentUser();
+
+    // Filter listings belonging to the logged-in user
+    const listings = getListings().filter(
+      l => l.owner === (user && user.email)
+    );
+
+    if (listings.length === 0) {
+      myListingsEl.innerHTML = `
+        <p class="muted">No listings. Create one from Register page.</p>
+      `;
+    } else {
+      myListingsEl.innerHTML = listings.map(l => `
+        <div style="margin-bottom:8px">
+          <strong>${escapeHtml(l.trade)}</strong>
+          <div class="muted">${escapeHtml(l.location)}</div>
+        </div>
+      `).join('');
+    }
+
+    // Filter requests (by user or to user’s listings)
+    const requests = getRequests().filter(r => {
+      return r.by === (user && user.email) ||
+             listings.some(ls => ls.id === r.to);
+    });
+
+    if (requests.length === 0) {
+      myRequestsEl.innerHTML = `
+        <p class="muted">No requests yet.</p>
+      `;
+    } else {
+      myRequestsEl.innerHTML = requests.map(r => `
+        <div style="margin-bottom:10px">
+          <div><strong>Message</strong></div>
+          <div class="muted">${escapeHtml(r.message)}</div>
+          <div style="font-size:12px;color:var(--muted)">
+            ${escapeHtml(new Date(r.at).toLocaleString())}
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
